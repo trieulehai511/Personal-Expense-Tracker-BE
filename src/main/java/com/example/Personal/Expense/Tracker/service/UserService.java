@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -48,7 +49,9 @@ public class UserService {
 
         return userMapper.toUserResponse(user);
     }
-
+    public List<UserResponse> getUsers(){
+        return userRepository.findAll().stream().map(userMapper::toUserResponse).toList();
+    }
 //    public UserResponse updateUser(String userId, UserUpdateRequest rq){
 //        User user = userRepository.findById(userId).orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED));
 //        userMapper.
