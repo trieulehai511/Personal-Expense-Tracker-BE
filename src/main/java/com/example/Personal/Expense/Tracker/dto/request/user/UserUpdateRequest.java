@@ -1,6 +1,5 @@
 package com.example.Personal.Expense.Tracker.dto.request.user;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -14,15 +13,14 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserCreationRequest {
-
+public class UserUpdateRequest {
     @Size(min = 4, message = "USERNAME INVALID")
     String username;
     @Size(min = 4, message = "INVALID PASSWORD")
     String password;
     String firstName;
     String lastName;
-//    @DobConstraint(min = 10, message = "INVALID_DOB")
+    //    @DobConstraint(min = 10, message = "INVALID_DOB")
 //    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     LocalDate dob;
 }
