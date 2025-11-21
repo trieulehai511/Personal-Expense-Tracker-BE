@@ -1,4 +1,4 @@
-package com.example.Personal.Expense.Tracker.controller.user;
+package com.example.Personal.Expense.Tracker.controller;
 
 import com.example.Personal.Expense.Tracker.dto.request.user.UserCreationRequest;
 import com.example.Personal.Expense.Tracker.dto.response.user.UserResponse;
@@ -7,11 +7,9 @@ import com.example.Personal.Expense.Tracker.entity.User;
 import com.example.Personal.Expense.Tracker.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -25,5 +23,23 @@ public class UserController {
         return APIResponse.<UserResponse>builder()
                 .result(userService.createUser(rq))
                 .build();
+    }
+
+    @GetMapping
+    APIResponse<List<UserResponse>> getUser(){
+        return APIResponse.<List<UserResponse>>builder().result(
+                userService.getUsers()
+        ).build();
+    }
+
+    @GetMapping("/{ID}")
+    APIResponse<UserResponse> getUserById(@PathVariable("ID") String id){
+        return APIResponse.<UserResponse>builder().result(userService.getUser(id)).build();
+    }
+
+
+    @GetMapping("/myInfo")
+    APIResponse<UserResponse> getMyInfo(){
+        return APIResponse.<UserResponse>builder().result(userService.getMyInfo()).build();
     }
 }
