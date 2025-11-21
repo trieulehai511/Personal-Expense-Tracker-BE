@@ -1,4 +1,4 @@
-package com.example.Personal.Expense.Tracker.controller.user;
+package com.example.Personal.Expense.Tracker.controller;
 
 import com.example.Personal.Expense.Tracker.dto.request.user.UserCreationRequest;
 import com.example.Personal.Expense.Tracker.dto.response.user.UserResponse;
@@ -7,7 +7,6 @@ import com.example.Personal.Expense.Tracker.entity.User;
 import com.example.Personal.Expense.Tracker.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,5 +30,16 @@ public class UserController {
         return APIResponse.<List<UserResponse>>builder().result(
                 userService.getUsers()
         ).build();
+    }
+
+    @GetMapping("/{ID}")
+    APIResponse<UserResponse> getUserById(@PathVariable("ID") String id){
+        return APIResponse.<UserResponse>builder().result(userService.getUser(id)).build();
+    }
+
+
+    @GetMapping("/myInfo")
+    APIResponse<UserResponse> getMyInfo(){
+        return APIResponse.<UserResponse>builder().result(userService.getMyInfo()).build();
     }
 }
