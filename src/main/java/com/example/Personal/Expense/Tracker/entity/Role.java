@@ -8,13 +8,14 @@ import lombok.experimental.FieldDefaults;
 
 import java.util.Set;
 
-@Setter
 @Getter
+@Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-public class Role {
+public class Role{
 
     @Id
     String name;
