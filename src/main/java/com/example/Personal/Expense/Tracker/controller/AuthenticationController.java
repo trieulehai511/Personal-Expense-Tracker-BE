@@ -1,4 +1,4 @@
-package com.example.Personal.Expense.Tracker.controller.user;
+package com.example.Personal.Expense.Tracker.controller;
 
 
 import com.example.Personal.Expense.Tracker.dto.request.authentication.AuthenticationRequest;
