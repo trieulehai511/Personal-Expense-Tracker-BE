@@ -3,6 +3,8 @@ package com.example.Personal.Expense.Tracker.controller;
 
 import com.example.Personal.Expense.Tracker.dto.request.authentication.AuthenticationRequest;
 import com.example.Personal.Expense.Tracker.dto.request.authentication.IntrospectTokenRequest;
+import com.example.Personal.Expense.Tracker.dto.request.authentication.LogoutRequest;
+import com.example.Personal.Expense.Tracker.dto.request.authentication.RefreshRequest;
 import com.example.Personal.Expense.Tracker.dto.response.authentication.AuthenticationResponse;
 import com.example.Personal.Expense.Tracker.dto.response.authentication.IntrospectResponse;
 import com.example.Personal.Expense.Tracker.dto.response.utils.APIResponse;
@@ -40,4 +42,16 @@ public class AuthenticationController {
         ).build();
     }
 
+    @PostMapping("/logout")
+    APIResponse<Void> logout(@RequestBody LogoutRequest rq) throws ParseException, JOSEException {
+        authenticationService.logout(rq);
+        return APIResponse.<Void>builder().build();
+    }
+
+    @PostMapping("/refresh")
+    APIResponse<AuthenticationResponse> authenticate(@RequestBody RefreshRequest request)
+            throws ParseException, JOSEException {
+        var result = authenticationService.refreshToken(request);
+        return APIResponse.<AuthenticationResponse>builder().result(result).build();
+    }
 }

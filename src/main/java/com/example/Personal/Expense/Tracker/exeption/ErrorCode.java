@@ -17,6 +17,13 @@ public enum ErrorCode {
     UNAUTHENTICATED(1006, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1007, "You do not have permission", HttpStatus.FORBIDDEN),
     INVALID_DOB(1008, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
+
+    //Permissions
+    PERMISSION_NOT_EXISTED(2001, "Permission is not existed", HttpStatus.NOT_FOUND),
+
+
+
+    DATA_API_ERROR(36, "Internal data access usage error", HttpStatus.BAD_REQUEST)
     ;
 
 

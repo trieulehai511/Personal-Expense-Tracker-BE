@@ -1,6 +1,8 @@
 package com.example.Personal.Expense.Tracker.entity;
 
+import com.example.Personal.Expense.Tracker.validator.DobConstrain;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
