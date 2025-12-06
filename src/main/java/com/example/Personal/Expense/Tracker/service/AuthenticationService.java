@@ -44,9 +44,14 @@ import java.util.UUID;
 public class AuthenticationService {
     UserRepository userRepository;
     InvalidatedTokenRepository invalidatedTokenRepository;
+    PasswordEncoder passwordEncoder;
     @NonFinal
     @Value("${jwt.signerKey}")
     protected String SINGER_KEY;
+
+    @NonFinal
+    @Value("${jwt.valid-duration}")
+    protected long VALID_DURATION;
 
     @NonFinal
     @Value("${jwt.refreshable-duration}")
@@ -70,22 +75,20 @@ public class AuthenticationService {
         JWSVerifier jwsVerifier = new MACVerifier(SINGER_KEY.getBytes());
 
         SignedJWT signedJWT = SignedJWT.parse(token);
+        var verified = signedJWT.verify(jwsVerifier);
+        if(!verified) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
         Date expiryTime = (isRefresh)
-                ? new Date(signedJWT
-                .getJWTClaimsSet()
-                .getIssueTime()
-                .toInstant()
-                .plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS)
-                .toEpochMilli())
+                ? new Date(signedJWT.getJWTClaimsSet().getIssueTime().toInstant()
+                .plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS).toEpochMilli())
                 : signedJWT.getJWTClaimsSet().getExpirationTime();
 
-        var verified = signedJWT.verify(jwsVerifier);
-        if(!verified && expiryTime.after(new Date())){
-                throw new AppException(ErrorCode.UNAUTHENTICATED);
+        if (expiryTime.before(new Date())) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
-
         if (invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID())){
-            throw  new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
 
         return signedJWT;
@@ -103,8 +106,7 @@ public class AuthenticationService {
 
         var username = signedJWT.getJWTClaimsSet().getSubject();
 
-        var user =
-                userRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+        var user = userRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
 
         var token = generateToken(user);
 
@@ -112,9 +114,7 @@ public class AuthenticationService {
     }
     public AuthenticationResponse authenticate(AuthenticationRequest rq){
         var user = userRepository.findByUsername(rq.getUsername()).orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED));
-
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-        boolean authenticated =  passwordEncoder.matches(rq.getPassword(), user.getPassword());
+        boolean authenticated = passwordEncoder.matches(rq.getPassword(), user.getPassword());
         if(!authenticated){
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
@@ -123,15 +123,21 @@ public class AuthenticationService {
     }
 
     public void logout(LogoutRequest rq) throws JOSEException, ParseException {
-            var signToken =  verifyToken(rq.getToken(), true);
+        try {
+            var signToken = verifyToken(rq.getToken(), false);
             String jit = signToken.getJWTClaimsSet().getJWTID();
             Date expiryTime = signToken.getJWTClaimsSet().getExpirationTime();
 
-            InvalidatedToken invalidatedToken = InvalidatedToken.builder().id(jit).expiryTime(expiryTime).build();
+            InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+                    .id(jit)
+                    .expiryTime(expiryTime)
+                    .build();
 
             invalidatedTokenRepository.save(invalidatedToken);
+        } catch (AppException e){
+            log.info("Token already invalidated or expired");
+        }
     }
-
     String generateToken(User user){
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
@@ -139,7 +145,7 @@ public class AuthenticationService {
                 subject(user.getUsername())
                 .issuer("haynes.com")
                 .issueTime(new Date())
-                .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS)
+                .expirationTime(new Date(Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS)
                         .toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())
                 .claim("scope" , buildScope(user))
