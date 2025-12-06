@@ -74,8 +74,18 @@ public class UserService {
         return userMapper.toUserResponse(user);
 
     }
-//    public UserResponse updateUser(String userId, UserUpdateRequest rq){
-//        User user = userRepository.findById(userId).orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED));
-//        userMapper.
-//    }
+    @PostAuthorize("returnObject.username == authentication.name or hasRole('ADMIN')")
+    public UserResponse updateUser(String userId, UserUpdateRequest rq){
+        User user = userRepository.findById(userId).orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED));
+        userMapper.updateUser(user, rq);
+        user.setPassword(passwordEncoder.encode(rq.getPassword()));
+        var roles = roleRepository.findAllById(rq.getRoles());
+        user.setRoles(new HashSet<>(roles));
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteUser(String userId) {
+        userRepository.deleteById(userId);
+    }
 }
