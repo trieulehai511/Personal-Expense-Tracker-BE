@@ -4,10 +4,12 @@ import com.example.Personal.Expense.Tracker.constant.PredefinedRole;
 import com.example.Personal.Expense.Tracker.dto.request.user.UserCreationRequest;
 import com.example.Personal.Expense.Tracker.dto.request.user.UserUpdateRequest;
 import com.example.Personal.Expense.Tracker.dto.response.user.UserResponse;
+import com.example.Personal.Expense.Tracker.dto.response.utils.PageResponse;
 import com.example.Personal.Expense.Tracker.entity.Role;
 import com.example.Personal.Expense.Tracker.entity.User;
 import com.example.Personal.Expense.Tracker.exeption.AppException;
 import com.example.Personal.Expense.Tracker.exeption.ErrorCode;
+import com.example.Personal.Expense.Tracker.mapper.PageMapper;
 import com.example.Personal.Expense.Tracker.mapper.UserMapper;
 import com.example.Personal.Expense.Tracker.repository.RoleRepository;
 import com.example.Personal.Expense.Tracker.repository.UserRepository;
@@ -16,6 +18,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,7 +40,7 @@ public class UserService {
     RoleRepository roleRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
-
+    PageMapper pageMapper;
 
     public UserResponse createUser(UserCreationRequest rq){
         User user = userMapper.toUser(rq);
@@ -54,9 +59,10 @@ public class UserService {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    public List<UserResponse> getUsers(){
+    public PageResponse<UserResponse> getUsers(Pageable pageable){
         log.info("In method get user");
-        return userRepository.findAll().stream().map(userMapper::toUserResponse).toList();
+        Page<User> users = userRepository.findAll(pageable);
+        return pageMapper.toPageResponse(users, userMapper::toUserResponse);
     }
 
     @PostAuthorize("returnObject.username == authentication.name")

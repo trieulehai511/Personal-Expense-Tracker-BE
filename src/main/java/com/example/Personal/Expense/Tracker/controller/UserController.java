@@ -4,6 +4,7 @@ import com.example.Personal.Expense.Tracker.dto.request.user.UserCreationRequest
 import com.example.Personal.Expense.Tracker.dto.request.user.UserUpdateRequest;
 import com.example.Personal.Expense.Tracker.dto.response.user.UserResponse;
 import com.example.Personal.Expense.Tracker.dto.response.utils.APIResponse;
+import com.example.Personal.Expense.Tracker.dto.response.utils.PageResponse;
 import com.example.Personal.Expense.Tracker.entity.User;
 import com.example.Personal.Expense.Tracker.service.UserService;
 import jakarta.validation.Valid;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,9 +36,9 @@ public class UserController {
     }
 
     @GetMapping
-    APIResponse<List<UserResponse>> getUser(){
-        return APIResponse.<List<UserResponse>>builder().result(
-                userService.getUsers()
+    APIResponse<PageResponse<UserResponse>> getUser(Pageable pageable) {
+        return APIResponse.<PageResponse<UserResponse>>builder().result(
+                userService.getUsers(pageable)
         ).build();
     }
 

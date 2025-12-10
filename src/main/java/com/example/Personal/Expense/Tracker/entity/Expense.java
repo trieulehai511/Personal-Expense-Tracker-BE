@@ -15,6 +15,10 @@ import java.time.LocalDate;
 @Builder
 @Setter
 @Getter
+@Table(name = "expense", indexes = {
+        @Index(name = "idx_expense_date", columnList = "date"),
+        @Index(name = "idx_expense_category", columnList = "category_id")
+})
 public class Expense {
 
     @Id
