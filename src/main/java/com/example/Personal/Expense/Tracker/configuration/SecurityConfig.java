@@ -1,5 +1,6 @@
 package com.example.Personal.Expense.Tracker.configuration;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,11 +27,14 @@ public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINT = {
             "/users",
             "/auth/log-in" ,
-            "/auth/introspect"
+            "/auth/introspect",
+            "/auth/logout",
+            "/auth/refresh"
     };
 
-    @Value("${jwt.signerKey}")
-    private String signerKey;
+    @Autowired
+    private CustomJWTDecoder customJwtDecoder;
+
     @Bean
     public SecurityFilterChain filterChain (HttpSecurity httpSecurity) throws Exception{
 
@@ -42,22 +46,18 @@ public class SecurityConfig {
         httpSecurity.oauth2ResourceServer(
                 oauth2->
                         oauth2.jwt(jwtConfigurer ->
-                                        jwtConfigurer.decoder(jwtDecoder()).jwtAuthenticationConverter(jwtAuthenticationConverter()))
-                                .authenticationEntryPoint()
+                                        jwtConfigurer.decoder(customJwtDecoder).jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                                .authenticationEntryPoint(new JWTAuthenticationEntryPoint())
         );
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
         return  httpSecurity.build();
     }
-    @Bean
-    JwtDecoder jwtDecoder(){
-        SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS5122");
-        return NimbusJwtDecoder.withSecretKey(secretKeySpec).macAlgorithm(MacAlgorithm.HS512).build();
-    };
+
 
     @Bean
     JwtAuthenticationConverter jwtAuthenticationConverter(){
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
 
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
@@ -65,7 +65,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    PasswordEncoder passwordEncoder(){
+    static PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder(10);
     }
 

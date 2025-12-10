@@ -8,19 +8,18 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserUpdateRequest {
-    @Size(min = 4, message = "USERNAME INVALID")
-    String username;
-    @Size(min = 4, message = "INVALID PASSWORD")
     String password;
     String firstName;
     String lastName;
-    //    @DobConstraint(min = 10, message = "INVALID_DOB")
-//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+
     LocalDate dob;
+
+    List<String> roles;
 }
