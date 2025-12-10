@@ -35,4 +35,7 @@ public class User {
 
     @ManyToMany
     Set<Role> roles;
+
+    @OneToMany(mappedBy = "user")
+    Set<Expense>  expenses;
 }
