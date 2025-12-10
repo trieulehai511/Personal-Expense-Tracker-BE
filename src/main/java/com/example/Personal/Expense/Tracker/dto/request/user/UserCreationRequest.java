@@ -1,5 +1,6 @@
 package com.example.Personal.Expense.Tracker.dto.request.user;
 
+import com.example.Personal.Expense.Tracker.validator.DobConstrain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
@@ -24,5 +25,6 @@ public class UserCreationRequest {
     String lastName;
 //    @DobConstraint(min = 10, message = "INVALID_DOB")
 //    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+    @DobConstrain(min = 10, message = "INVALID_DOB")
     LocalDate dob;
 }
