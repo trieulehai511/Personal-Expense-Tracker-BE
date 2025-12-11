@@ -1,6 +1,5 @@
 package com.example.Personal.Expense.Tracker.service;
 
-
 import com.example.Personal.Expense.Tracker.dto.request.expense.ExpenseCreationRequest;
 import com.example.Personal.Expense.Tracker.dto.request.expense.ExpenseUpdateRequest;
 import com.example.Personal.Expense.Tracker.dto.response.expense.ExpenseResponse;
@@ -14,7 +13,6 @@ import com.example.Personal.Expense.Tracker.mapper.ExpenseMapper;
 import com.example.Personal.Expense.Tracker.mapper.PageMapper;
 import com.example.Personal.Expense.Tracker.repository.CategoryRepository;
 import com.example.Personal.Expense.Tracker.repository.ExpenseRepository;
-import com.example.Personal.Expense.Tracker.repository.UserRepository;
 import com.example.Personal.Expense.Tracker.repository.specification.ExpenseSpecification;
 import com.example.Personal.Expense.Tracker.utils.SecurityUtils;
 import lombok.AccessLevel;
@@ -22,10 +20,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.stereotype.Service;
 
-import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -35,11 +33,10 @@ import java.util.List;
 @Slf4j
 public class ExpenseService {
     ExpenseRepository expenseRepository;
-    ExpenseMapper  expenseMapper;
+    ExpenseMapper expenseMapper;
     SecurityUtils securityUtils;
     CategoryRepository categoryRepository;
     PageMapper pageMapper;
-
 
     public ExpenseResponse create(ExpenseCreationRequest rq){
         User user =  securityUtils.getCurrentUser();
@@ -63,7 +60,6 @@ public class ExpenseService {
         return pageMapper.toPageResponse(pageData, expenseMapper::toExpenseResponse);
     }
 
-
     @PostAuthorize("returnObject.user.username == authentication.name or hasRole('ADMIN')")
     public ExpenseResponse findById(String id){
         Expense expense = expenseRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.EXPENSE_NOT_EXISTED));
@@ -75,15 +71,13 @@ public class ExpenseService {
                 .orElseThrow(() -> new AppException(ErrorCode.EXPENSE_NOT_EXISTED));
         User user = securityUtils.getCurrentUser();
         if (!expense.getUser().getId().equals(user.getId())) {
-            throw new AppException(ErrorCode.UNAUTHORIZED); //
+            throw new AppException(ErrorCode.UNAUTHORIZED);
         }
-
         expenseRepository.delete(expense);
     }
 
     public ExpenseResponse updateExpense(String expenseId, ExpenseUpdateRequest expenseUpdateRequest){
         Expense expense = expenseRepository.findById(expenseId).orElseThrow(() -> new AppException(ErrorCode.EXPENSE_NOT_EXISTED));
-
         User user = securityUtils.getCurrentUser();
         if(!user.getId().equals(expense.getUser().getId())){
             throw new AppException(ErrorCode.UNAUTHORIZED);
@@ -96,6 +90,4 @@ public class ExpenseService {
         }
         return expenseMapper.toExpenseResponse(expenseRepository.save(expense));
     }
-
-
 }

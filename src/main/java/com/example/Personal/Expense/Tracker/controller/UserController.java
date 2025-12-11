@@ -1,5 +1,6 @@
 package com.example.Personal.Expense.Tracker.controller;
 
+import com.example.Personal.Expense.Tracker.dto.request.user.PasswordChangeRequest;
 import com.example.Personal.Expense.Tracker.dto.request.user.UserCreationRequest;
 import com.example.Personal.Expense.Tracker.dto.request.user.UserUpdateRequest;
 import com.example.Personal.Expense.Tracker.dto.response.user.UserResponse;
@@ -56,5 +57,20 @@ public class UserController {
     @PutMapping("/{ID}")
     APIResponse<UserResponse> update(@PathVariable("ID") String ID ,  @RequestBody UserUpdateRequest rq){
         return APIResponse.<UserResponse>builder().result(userService.updateUser(ID,rq)).build();
+    }
+
+    @PutMapping("/my-info")
+    APIResponse<UserResponse> updateMyInfo(@RequestBody UserUpdateRequest rq) {
+        return APIResponse.<UserResponse>builder()
+                .result(userService.updateMyInfo(rq))
+                .build();
+    }
+
+    @PutMapping("/change-password")
+    APIResponse<String> changePassword(@RequestBody @Valid PasswordChangeRequest rq) {
+        userService.changePassword(rq);
+        return APIResponse.<String>builder()
+                .result("Password has been changed successfully")
+                .build();
     }
 }

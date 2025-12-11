@@ -1,6 +1,7 @@
 package com.example.Personal.Expense.Tracker.service;
 
 import com.example.Personal.Expense.Tracker.constant.PredefinedRole;
+import com.example.Personal.Expense.Tracker.dto.request.user.PasswordChangeRequest;
 import com.example.Personal.Expense.Tracker.dto.request.user.UserCreationRequest;
 import com.example.Personal.Expense.Tracker.dto.request.user.UserUpdateRequest;
 import com.example.Personal.Expense.Tracker.dto.response.user.UserResponse;
@@ -13,6 +14,7 @@ import com.example.Personal.Expense.Tracker.mapper.PageMapper;
 import com.example.Personal.Expense.Tracker.mapper.UserMapper;
 import com.example.Personal.Expense.Tracker.repository.RoleRepository;
 import com.example.Personal.Expense.Tracker.repository.UserRepository;
+import com.example.Personal.Expense.Tracker.utils.SecurityUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -41,6 +43,7 @@ public class UserService {
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
     PageMapper pageMapper;
+    SecurityUtils securityUtils;
 
     public UserResponse createUser(UserCreationRequest rq){
         User user = userMapper.toUser(rq);
@@ -80,16 +83,35 @@ public class UserService {
         return userMapper.toUserResponse(user);
 
     }
-    @PostAuthorize("returnObject.username == authentication.name or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public UserResponse updateUser(String userId, UserUpdateRequest rq){
         User user = userRepository.findById(userId).orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED));
         userMapper.updateUser(user, rq);
-        user.setPassword(passwordEncoder.encode(rq.getPassword()));
+        if (rq.getPassword() != null && !rq.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(rq.getPassword()));
+        }
         var roles = roleRepository.findAllById(rq.getRoles());
         user.setRoles(new HashSet<>(roles));
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
+    public UserResponse updateMyInfo(UserUpdateRequest rq){
+        User user = securityUtils.getCurrentUser();
+
+        userMapper.updateUser(user, rq);
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
+
+
+    public void changePassword(PasswordChangeRequest rq) {
+        User user = securityUtils.getCurrentUser();
+
+        if (!passwordEncoder.matches(rq.getOldPassword(), user.getPassword())) {
+            throw new AppException(ErrorCode.PASSWORD_NOT_CORRECT);
+        }
+        user.setPassword(passwordEncoder.encode(rq.getNewPassword()));
+        userRepository.save(user);
+    }
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteUser(String userId) {
         userRepository.deleteById(userId);

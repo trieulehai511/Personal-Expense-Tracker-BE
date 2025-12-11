@@ -29,7 +29,10 @@ public class SecurityConfig {
             "/auth/log-in" ,
             "/auth/introspect",
             "/auth/logout",
-            "/auth/refresh"
+            "/auth/refresh",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html"
     };
 
     @Autowired
@@ -41,6 +44,7 @@ public class SecurityConfig {
         httpSecurity.authorizeHttpRequests(request ->
 
                 request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINT).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
         );
         httpSecurity.oauth2ResourceServer(
