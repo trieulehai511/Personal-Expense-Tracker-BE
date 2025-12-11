@@ -32,4 +32,15 @@ public class CategoryController {
     public APIResponse<List<CategoryResponse>> findAll(){
         return APIResponse.<List<CategoryResponse>>builder().result(categoryService.getAll()).build();
     }
+
+    @PutMapping("/{ID}")
+    public APIResponse<CategoryResponse> update(@PathVariable String ID, @RequestBody CategoryRequest rq){
+        return APIResponse.<CategoryResponse>builder().result(categoryService.update(ID, rq)).build();
+    }
+
+    @DeleteMapping("/{ID}")
+    public APIResponse<String> delete(@PathVariable String ID){
+        categoryService.delete(ID);
+        return APIResponse.<String>builder().result("Category has been deleted").build();
+    }
 }
