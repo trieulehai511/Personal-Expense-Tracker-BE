@@ -1,9 +1,11 @@
 package com.example.Personal.Expense.Tracker.controller;
 
+import com.example.Personal.Expense.Tracker.dto.request.user.PasswordChangeRequest;
 import com.example.Personal.Expense.Tracker.dto.request.user.UserCreationRequest;
 import com.example.Personal.Expense.Tracker.dto.request.user.UserUpdateRequest;
 import com.example.Personal.Expense.Tracker.dto.response.user.UserResponse;
 import com.example.Personal.Expense.Tracker.dto.response.utils.APIResponse;
+import com.example.Personal.Expense.Tracker.dto.response.utils.PageResponse;
 import com.example.Personal.Expense.Tracker.entity.User;
 import com.example.Personal.Expense.Tracker.service.UserService;
 import jakarta.validation.Valid;
@@ -12,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,9 +37,9 @@ public class UserController {
     }
 
     @GetMapping
-    APIResponse<List<UserResponse>> getUser(){
-        return APIResponse.<List<UserResponse>>builder().result(
-                userService.getUsers()
+    APIResponse<PageResponse<UserResponse>> getUser(Pageable pageable) {
+        return APIResponse.<PageResponse<UserResponse>>builder().result(
+                userService.getUsers(pageable)
         ).build();
     }
 
@@ -54,5 +57,20 @@ public class UserController {
     @PutMapping("/{ID}")
     APIResponse<UserResponse> update(@PathVariable("ID") String ID ,  @RequestBody UserUpdateRequest rq){
         return APIResponse.<UserResponse>builder().result(userService.updateUser(ID,rq)).build();
+    }
+
+    @PutMapping("/my-info")
+    APIResponse<UserResponse> updateMyInfo(@RequestBody UserUpdateRequest rq) {
+        return APIResponse.<UserResponse>builder()
+                .result(userService.updateMyInfo(rq))
+                .build();
+    }
+
+    @PutMapping("/change-password")
+    APIResponse<String> changePassword(@RequestBody @Valid PasswordChangeRequest rq) {
+        userService.changePassword(rq);
+        return APIResponse.<String>builder()
+                .result("Password has been changed successfully")
+                .build();
     }
 }
