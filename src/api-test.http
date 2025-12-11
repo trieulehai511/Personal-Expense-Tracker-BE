@@ -1,0 +1,22 @@
+### 1. Đăng nhập để lấy Token (Chạy cái này trước)
+POST http://localhost:8080/personal-expense-tracker/auth/log-in
+Content-Type: application/json
+
+{
+  "username": "haitrieu_dev",
+  "password": "02587169"
+}
+
+> {%
+    // Script tự động lưu token vào biến môi trường (giống Postman)
+    client.global.set("auth_token", response.body.result.token);
+    client.log("Token đã được lưu: " + response.body.result.token);
+%}
+
+### 2. Test Dashboard (Tháng này)
+GET http://localhost:8080/personal-expense-tracker/dashboard
+Authorization: Bearer {{auth_token}}
+
+### 3. Test Dashboard (Theo khoảng thời gian)
+GET http://localhost:8080/personal-expense-tracker/dashboard?startDate=2023-01-01&endDate=2023-12-31
+Authorization: Bearer {{auth_token}}

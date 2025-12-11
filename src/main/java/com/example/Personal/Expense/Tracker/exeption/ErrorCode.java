@@ -17,11 +17,16 @@ public enum ErrorCode {
     UNAUTHENTICATED(1006, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1007, "You do not have permission", HttpStatus.FORBIDDEN),
     INVALID_DOB(1008, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
-
+    PASSWORD_NOT_CORRECT(1009, "Old password is not correct", HttpStatus.BAD_REQUEST),
     //Permissions
     PERMISSION_NOT_EXISTED(2001, "Permission is not existed", HttpStatus.NOT_FOUND),
 
+    //Category
+    CATEGORY_NOT_EXISTED(2002, "Category is not existed", HttpStatus.NOT_FOUND),
+    CATEGORY_CANNOT_DELETE(2003, "Category cannot be deleted", HttpStatus.BAD_REQUEST),
 
+    //Expense
+    EXPENSE_NOT_EXISTED(3003, "Expense is not existed", HttpStatus.NOT_FOUND),
 
     DATA_API_ERROR(36, "Internal data access usage error", HttpStatus.BAD_REQUEST)
     ;
