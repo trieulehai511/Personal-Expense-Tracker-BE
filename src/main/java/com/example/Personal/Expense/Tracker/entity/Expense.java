@@ -1,6 +1,7 @@
 package com.example.Personal.Expense.Tracker.entity;
 
 
+import com.example.Personal.Expense.Tracker.enums.TransactionType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -28,6 +29,9 @@ public class Expense {
     BigDecimal amount;
     LocalDate date;
     String description;
+
+    @Enumerated(EnumType.STRING)
+    TransactionType type;
 
     @ManyToOne
     @JoinColumn(name = "category_id")

@@ -12,6 +12,8 @@ import java.util.List;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DashboardResponse {
-    BigDecimal totalSpent;
+    BigDecimal totalIncome;     // Tổng thu
+    BigDecimal totalExpense;    // Tổng chi (Sửa tên từ totalSpent -> totalExpense cho đồng bộ)
+    BigDecimal currentBalance;
     List<CategoryStatResponse> categoryStats;
 }

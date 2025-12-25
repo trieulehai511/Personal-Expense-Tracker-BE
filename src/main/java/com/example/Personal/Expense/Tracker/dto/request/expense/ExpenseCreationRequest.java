@@ -1,6 +1,7 @@
 package com.example.Personal.Expense.Tracker.dto.request.expense;
 
 import com.example.Personal.Expense.Tracker.entity.Category;
+import com.example.Personal.Expense.Tracker.enums.TransactionType;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -25,4 +26,6 @@ public class ExpenseCreationRequest {
     LocalDate date;
     String description;
     String categoryId;
+
+    TransactionType type;
 }
