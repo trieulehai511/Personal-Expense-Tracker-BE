@@ -7,14 +7,16 @@ import com.example.Personal.Expense.Tracker.service.DashBoardService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 
-@Controller
+@RestController
 @RequestMapping("/dashboard")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -23,8 +25,8 @@ public class DashboardController {
     DashBoardService  dashBoardService;
 
     @GetMapping
-    APIResponse<DashboardResponse> getDashboard(@RequestParam(required = false) LocalDate startDate,
-                                                @RequestParam(required = false) LocalDate endDate) {
+    APIResponse<DashboardResponse> getDashboard(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         return APIResponse.<DashboardResponse>builder().result(dashBoardService.getAnalytics(startDate,endDate)).build();
     }
 }

@@ -27,7 +27,7 @@ public enum ErrorCode {
 
     //Expense
     EXPENSE_NOT_EXISTED(3003, "Expense is not existed", HttpStatus.NOT_FOUND),
-
+    INVALID_DATE_RANGE( 3004,"Start day must be before end day", HttpStatus.BAD_REQUEST),
     DATA_API_ERROR(36, "Internal data access usage error", HttpStatus.BAD_REQUEST)
     ;
 
