@@ -113,4 +113,15 @@ public class ExpenseService {
         }
         return expenseMapper.toExpenseResponse(expenseRepository.save(expense));
     }
+
+    public void createSystemExpense(ExpenseCreationRequest rq, User user) {
+        Category category = categoryRepository.findById(rq.getCategoryId())
+                .orElseThrow(()-> new AppException(ErrorCode.CATEGORY_NOT_EXISTED));
+
+        Expense expense = expenseMapper.toExpense(rq);
+        expense.setUser(user);
+        expense.setCategory(category);
+
+        expenseRepository.save(expense);
+    }
 }
