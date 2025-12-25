@@ -29,32 +29,24 @@ public interface ExpenseRepository extends JpaRepository<Expense,String>, JpaSpe
                                    @Param("endDate") LocalDate endDate);
 
     @Query("""
-
     SELECT SUM(e.amount) FROM Expense e 
-
     WHERE e.user = :user 
-
+    AND e.type = 'EXPENSE' 
     AND (:category IS NULL OR e.category = :category) 
-
     AND e.date BETWEEN :startDate AND :endDate
-
 """)
-
     BigDecimal calculateCategorySpent(
-
             @Param("user") User user,
-
             @Param("category") Category category,
-
             @Param("startDate") LocalDate startDate,
-
             @Param("endDate") LocalDate endDate
-
     );
 
     @Query("SELECT new com.example.Personal.Expense.Tracker.dto.response.dashboard.CategoryStatResponse(e.category.name, SUM(e.amount)) " +
             "FROM Expense e " +
-            "WHERE e.user = :user AND e.date BETWEEN :startDate AND :endDate " +
+            "WHERE e.user = :user " +
+            "AND e.type = 'EXPENSE' " +
+            "AND e.date BETWEEN :startDate AND :endDate " +
             "GROUP BY e.category.name")
     List<CategoryStatResponse> getCategoryStats(@Param("user") User user,
                                                 @Param("startDate") LocalDate startDate,

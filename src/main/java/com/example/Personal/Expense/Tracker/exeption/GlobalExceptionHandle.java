@@ -20,14 +20,14 @@ public class GlobalExceptionHandle {
     private static final String MIN_ATTRIBUTE = "min";
 
     @ExceptionHandler(value = Exception.class)
-    ResponseEntity<APIResponse> handlingRuntimeException(Exception exception) { // ✅ Sửa thành Exception
+    ResponseEntity<APIResponse> handlingRuntimeException(Exception exception) {
         log.error("Exception: ", exception);
         APIResponse apiResponse = new APIResponse();
 
         apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
         apiResponse.setMessage(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
 
-        return ResponseEntity.badRequest().body(apiResponse);
+        return ResponseEntity.internalServerError().body(apiResponse);
     }
 
     @ExceptionHandler(value = AppException.class)

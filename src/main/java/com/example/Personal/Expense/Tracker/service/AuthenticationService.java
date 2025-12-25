@@ -47,8 +47,7 @@ public class AuthenticationService {
     PasswordEncoder passwordEncoder;
     @NonFinal
     @Value("${jwt.signerKey}")
-    protected String SINGER_KEY;
-
+    protected String SIGNER_KEY;
     @NonFinal
     @Value("${jwt.valid-duration}")
     protected long VALID_DURATION;
@@ -72,7 +71,7 @@ public class AuthenticationService {
     }
 
     private SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException {
-        JWSVerifier jwsVerifier = new MACVerifier(SINGER_KEY.getBytes());
+        JWSVerifier jwsVerifier = new MACVerifier(SIGNER_KEY.getBytes());
 
         SignedJWT signedJWT = SignedJWT.parse(token);
         var verified = signedJWT.verify(jwsVerifier);
@@ -154,7 +153,7 @@ public class AuthenticationService {
 
         JWSObject jwsObject = new JWSObject(header,payload);
         try {
-            jwsObject.sign(new MACSigner(SINGER_KEY.getBytes()));
+            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
             return jwsObject.serialize();
         } catch (JOSEException e) {
             System.out.println("Cannot generate token");
